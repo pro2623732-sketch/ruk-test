@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диагностика мотивации — тест Макклелланда</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+  #pdf-render {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 794px;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    color: #1A1714;
+    padding: 50px 56px;
+    box-sizing: border-box;
+    line-height: 1.5;
+  }
+</style>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F4EF;
+    --card: #FFFFFF;
+    --ink: #1A1714;
+    --muted: #7A7470;
+    --border: #E2DDD8;
+    --accent: #2D5A4E;
+    --accent2: #8B4513;
+    --accent3: #1A3A6E;
+    --ach: #2D5A4E;
+    --pow: #8B2020;
+    --aff: #1A3A6E;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .intro-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 500px) {
+    .intro-fields { grid-template-columns: 1fr; }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--accent); }
+
+  .progress-wrap {
+    margin-bottom: 2rem;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+
+  .progress-fill {
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .question-section { display: none; }
+  .question-section.active { display: block; }
+
+  .q-number {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .q-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .option:hover {
+    border-color: #BFBAB5;
+    background: var(--bg);
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: #EDF3F1;
+  }
+
+  .opt-bullet {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.18s;
+  }
+
+  .option.selected .opt-bullet {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .opt-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+
+  .option.selected .opt-dot { opacity: 1; }
+
+  .opt-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    padding-top: 2px;
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.75rem;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .btn:hover { background: var(--bg); color: var(--ink); }
+  .btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled { opacity: 0.3; }
+
+  /* Result */
+  #result-section { display: none; }
+
+  .result-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-hero .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-hero h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-hero .name-display {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 220px;
+    margin: 1.5rem 0;
+  }
+
+  .scores-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .score-card {
+    text-align: center;
+    padding: 16px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .score-card.leader {
+    border-width: 2px;
+  }
+
+  .score-card.ach.leader { border-color: var(--ach); background: #EDF3F1; }
+  .score-card.pow.leader { border-color: var(--pow); background: #F7EDED; }
+  .score-card.aff.leader { border-color: var(--aff); background: #EDF0F7; }
+
+  .score-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-card.ach .score-val { color: var(--ach); }
+  .score-card.pow .score-val { color: var(--pow); }
+  .score-card.aff .score-val { color: var(--aff); }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .winner-block {
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .winner-block.ach { background: #EDF3F1; border-left: 3px solid var(--ach); }
+  .winner-block.pow { background: #F7EDED; border-left: 3px solid var(--pow); }
+  .winner-block.aff { background: #EDF0F7; border-left: 3px solid var(--aff); }
+
+  .winner-block h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .winner-block.ach h3 { color: var(--ach); }
+  .winner-block.pow h3 { color: var(--pow); }
+  .winner-block.aff h3 { color: var(--aff); }
+
+  .winner-block p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #444;
+  }
+
+  .gaps-section h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+
+  .gap-item {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .gap-item strong {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .btn-pdf {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 1.25rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    transition: all 0.18s;
+  }
+  .btn-pdf:hover { background: #EDF3F1; }
+
+  .status-msg {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1rem;
+    min-height: 20px;
+  }
+
+  .status-msg.ok { color: var(--accent); }
+  .status-msg.err { color: var(--pow); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* Consent page */
+  #consent-section { display: block; }
+  #test-section { display: none; }
+
+  .consent-check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .consent-check-row:hover { background: var(--bg); }
+  .consent-check-row.checked { border-color: var(--accent); background: #EDF3F1; }
+
+  .consent-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+
+  .consent-check-row.checked .consent-checkbox {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .check-mark {
+    width: 10px;
+    height: 7px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg) translateY(-1px);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .consent-check-row.checked .check-mark { opacity: 1; }
+
+  .consent-check-label {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    padding-top: 1px;
+  }
+
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Consent + fields section (shown first) -->
+  <div id="consent-section">
+    <div class="card">
+      <div style="font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:0.6rem;">Тест</div>
+      <h2 style="font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:var(--ink); margin-bottom:0.75rem; line-height:1.2;">Диагностика мотивации руководителя</h2>
+      <p style="font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:1.75rem;">Прохождение теста занимает около 7 минут. Результаты вы увидите сразу в конце теста и сможете скачать в PDF.</p>
+
+      <div style="margin-bottom:1.5rem;">
+        <div class="field-group">
+          <label for="uname">Ваше имя</label>
+          <input type="text" id="uname" placeholder="Иван Петров">
+        </div>
+      </div>
+
+      <div class="consent-check-row" id="consent-row" onclick="toggleConsent()">
+        <div class="consent-checkbox"><div class="check-mark"></div></div>
+        <span class="consent-check-label">Я даю согласие на обработку персональных данных (имя, адрес электронной почты) в целях проведения данного тестирования, в соответствии с требованиями Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных». Данные используются исключительно для формирования результатов теста и не передаются третьим лицам.</span>
+      </div>
+
+      <button class="btn btn-primary" id="btn-consent" onclick="startTest()" disabled style="width:100%; padding:12px; font-size:15px; margin-top:0.25rem;">Далее →</button>
+    </div>
+  </div>
+
+  <!-- Test section -->
+  <div id="test-section" style="display:none;">
+
+    <div class="card">
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span id="q-prog-text">Вопрос 1 из 15</span>
+          <span id="q-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div id="questions-wrap"></div>
+
+      <div class="nav-row">
+        <button class="btn" id="btn-prev" onclick="navigate(-1)" disabled>← Назад</button>
+        <button class="btn btn-primary" id="btn-next" onclick="navigate(1)" disabled>Далее →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Result section -->
+  <div id="result-section">
+    <div class="card">
+      <div class="result-hero">
+        <div class="eyebrow">Результат</div>
+        <h2 id="res-heading">Ваш мотивационный профиль</h2>
+        <div class="name-display" id="res-name"></div>
+      </div>
+
+      <div class="scores-grid" id="scores-grid"></div>
+
+      <div class="chart-wrap">
+        <canvas id="myChart"></canvas>
+      </div>
+
+      <div id="winner-block-wrap"></div>
+
+      <div class="divider"></div>
+
+      <div class="gaps-section" id="gaps-wrap"></div>
+
+      <div class="status-msg" id="send-status"></div>
+      <button class="btn-pdf" onclick="downloadPDF()">⬇ Скачать результаты в PDF</button>
+    </div>
+  </div>
+
+  <div id="pdf-render" style="display:none;position:absolute;left:-9999px;top:0;"></div>
+
+</div>
+
+<script>
+const COACH_EMAIL = "pro2623732@gmail.com";
+
+const questions = [
+  {text:"Когда я берусь за сложную задачу, мне важнее всего:",opts:[
+    {t:"Выполнить её лучше, чем ожидают",s:"ach"},
+    {t:"Убедить других принять моё видение решения",s:"pow"},
+    {t:"Делать это вместе с командой, чувствуя поддержку",s:"aff"}
+  ]},
+  {text:"В работе меня по-настоящему заряжает:",opts:[
+    {t:"Достижение результата, который я сам поставил",s:"ach"},
+    {t:"Ощущение, что мои решения влияют на всю команду",s:"pow"},
+    {t:"Тёплая атмосфера и взаимное доверие с коллегами",s:"aff"}
+  ]},
+  {text:"Если проект идёт не по плану, я прежде всего:",opts:[
+    {t:"Ищу способы улучшить подход и нагнать отставание",s:"ach"},
+    {t:"Беру инициативу и перераспределяю задачи",s:"pow"},
+    {t:"Собираю команду, чтобы вместе разобраться",s:"aff"}
+  ]},
+  {text:"Лучшая обратная связь для меня — это:",opts:[
+    {t:"Конкретные данные о том, насколько хорошо я справился",s:"ach"},
+    {t:"Признание моего вклада и авторитета",s:"pow"},
+    {t:"Слова благодарности от людей, с которыми работаю",s:"aff"}
+  ]},
+  {text:"При выборе новой роли для меня важнее:",opts:[
+    {t:"Возможность расти профессионально и решать сложные задачи",s:"ach"},
+    {t:"Реальные полномочия и возможность принимать решения",s:"pow"},
+    {t:"Дружный коллектив и хорошие отношения с руководством",s:"aff"}
+  ]},
+  {text:"Когда в команде возникает конфликт, я склонен:",opts:[
+    {t:"Предложить чёткое решение, опираясь на факты",s:"ach"},
+    {t:"Взять роль арбитра и направить ситуацию",s:"pow"},
+    {t:"Сделать всё, чтобы сохранить хорошие отношения",s:"aff"}
+  ]},
+  {text:"Мне труднее всего:",opts:[
+    {t:"Работать без чётких целей и измеримых результатов",s:"ach"},
+    {t:"Быть в роли исполнителя без влияния на решения",s:"pow"},
+    {t:"Работать в холодной или конкурентной атмосфере",s:"aff"}
+  ]},
+  {text:"Свои лучшие идеи я генерирую:",opts:[
+    {t:"Анализируя задачу самостоятельно, с полной концентрацией",s:"ach"},
+    {t:"В дискуссии, где я могу отстаивать свою позицию",s:"pow"},
+    {t:"В мозговом штурме с людьми, которым доверяю",s:"aff"}
+  ]},
+  {text:"Я чувствую наибольший подъём, когда:",opts:[
+    {t:"Преодолеваю сложную задачу, которая казалась невозможной",s:"ach"},
+    {t:"Вижу, как команда следует моему направлению",s:"pow"},
+    {t:"Чувствую, что меня принимают и ценят в коллективе",s:"aff"}
+  ]},
+  {text:"В долгосрочной перспективе я стремлюсь:",opts:[
+    {t:"Стать признанным экспертом в своей области",s:"ach"},
+    {t:"Занять позицию с реальным влиянием на стратегию",s:"pow"},
+    {t:"Выстроить прочные, долгосрочные отношения в профессии",s:"aff"}
+  ]},
+  {text:"Когда мне дают автономию в проекте, я в первую очередь:",opts:[
+    {t:"Ставлю амбициозные цели и выстраиваю план достижения",s:"ach"},
+    {t:"Формирую вокруг себя команду и распределяю роли",s:"pow"},
+    {t:"Выясняю ожидания всех участников, чтобы учесть их интересы",s:"aff"}
+  ]},
+  {text:"Ошибка или неудача в работе прежде всего вызывает у меня желание:",opts:[
+    {t:"Разобраться в причинах и сделать лучше в следующий раз",s:"ach"},
+    {t:"Восстановить авторитет и исправить ситуацию",s:"pow"},
+    {t:"Поговорить с кем-то близким, чтобы переосмыслить",s:"aff"}
+  ]},
+  {text:"В командной работе я чаще всего принимаю роль:",opts:[
+    {t:"Исполнителя с высокой личной планкой качества",s:"ach"},
+    {t:"Организатора, который ведёт команду к результату",s:"pow"},
+    {t:"Человека, который сглаживает напряжение и поддерживает всех",s:"aff"}
+  ]},
+  {text:"Если мне предстоит сложный разговор с коллегой, я:",opts:[
+    {t:"Готовлюсь: факты, аргументы, желаемый исход",s:"ach"},
+    {t:"Веду разговор уверенно — мне важно донести свою позицию",s:"pow"},
+    {t:"Стараюсь начать мягко, чтобы не навредить отношениям",s:"aff"}
+  ]},
+  {text:"В идеале работа должна давать мне:",opts:[
+    {t:"Ощущение роста и постоянно новые вызовы",s:"ach"},
+    {t:"Возможность влиять на людей и принимаемые решения",s:"pow"},
+    {t:"Чувство принадлежности к чему-то большему вместе с близкими по духу людьми",s:"aff"}
+  ]}
+];
+
+const motiveInfo = {
+  ach: {
+    label:"Достижение",
+    fullLabel:"Ориентация на достижения",
+    color:"#2D5A4E",
+    bg:"#EDF3F1",
+    strong:`<strong>Сильные стороны.</strong> Ведущий мотив — личный результат, рост и мастерство. Такой руководитель ставит высокую планку качества, не останавливается на достигнутом и умеет доводить дело до конца даже в сложных условиях. Он хорошо работает в проектной среде с чёткими KPI, быстро обучается, инициативен и склонен к предпринимательскому мышлению. Команда рядом с ним часто "подтягивается" — его личный пример задаёт стандарт. Лучше всего раскрывается там, где есть реальная свобода действий и видимый результат.`,
+    gaps:`<strong>Зоны внимания.</strong> Главная ловушка — синдром "лучше сделаю сам". Такой руководитель с трудом делегирует, потому что чужой результат редко соответствует его внутренней планке. Это создаёт перегрузку, сужает команду и тормозит масштабирование. Он может недооценивать командную динамику: ему важен результат, а не то, как людям по пути. При длительном отсутствии прогресса — риск выгорания. Также может быть нетерпим к неопределённости и "серым зонам", где нет чёткого измеримого исхода.`,
+    recommend:`<strong>Как развиваться.</strong> 1. Практикуйте структурированное делегирование: ставьте задачу с чётким результатом, но оставляйте свободу в выборе пути — и принимайте результат, даже если он выглядит иначе, чем вы бы сделали сами. 2. Введите регулярные встречи один на один с каждым сотрудником — не для контроля, а чтобы понять, что им важно. 3. Учитесь ставить цели не только для себя, но и для команды: формулируйте общий результат, которым гордятся все. 4. Работайте с нетерпимостью к неопределённости: практикуйте решения в условиях неполных данных, фиксируйте промежуточный прогресс, а не только финальный результат. 5. Найдите для себя метрику развития людей — сделайте её такой же важной, как личные KPI.`
+  },
+  pow: {
+    label:"Власть",
+    fullLabel:"Ориентация на влияние и власть",
+    color:"#8B2020",
+    bg:"#F7EDED",
+    strong:`<strong>Сильные стороны.</strong> Ведущий мотив — влияние, лидерство и управление людьми. Такой руководитель умеет убеждать, вести переговоры, принимать жёсткие решения и брать ответственность за команду. Он естественно занимает лидерские позиции, умеет выстраивать иерархию и держать фокус на стратегии. Хорошо работает в условиях конкуренции и политически сложных средах. Когда мотив направлен на пользу дела (институциональная власть), такой лидер способен вдохновлять и строить сильные организации. Он не боится конфликта и умеет расставлять приоритеты.`,
+    gaps:`<strong>Зоны внимания.</strong> Критически важно различать два типа мотива власти: институциональный (влияние ради результата команды и компании) и личный (влияние ради статуса и контроля). Второй тип токсичен для организации. Признаки: руководитель принимает решения единолично даже там, где это не нужно, болезненно реагирует на несогласие, удерживает информацию как инструмент власти, окружает себя людьми, которые не возражают. Также риски: микроменеджмент, сложность с доверием к коллегам, ощущение угрозы со стороны сильных подчинённых.`,
+    recommend:`<strong>Как развиваться.</strong> 1. Задайте себе честный вопрос после каждого решения: "Я сделал это ради результата команды или ради собственного контроля?" — и фиксируйте ответ. 2. Целенаправленно выращивайте сильных подчинённых: человек, который может вас заменить или оспорить — это ресурс, а не угроза. 3. Практикуйте публичное признание чужих идей: называйте имя автора, когда транслируете его решение вышестоящим. 4. Развивайте эмпатию через активное слушание — на совещаниях дайте каждому высказаться до того, как озвучиваете свою позицию. 5. Работайте с коучем или ментором над темой "влияние без контроля": учитесь убеждать через доверие, а не через должность.`
+  },
+  aff: {
+    label:"Причастность / отношения",
+    fullLabel:"Ориентация на сотрудничество и отношения",
+    color:"#1A3A6E",
+    bg:"#EDF0F7",
+    strong:`<strong>Сильные стороны.</strong> Ведущий мотив — принадлежность, отношения и командный дух. Такой руководитель создаёт психологическую безопасность: с ним люди чувствуют себя услышанными, принятыми и важными. Он умеет объединять разных людей, сглаживать конфликты и выстраивать доверие — то, что часто невозможно "поставить задачей". Отлично работает в ролях наставника, HR-партнёра, лидера команды в переходные периоды. Его сотрудники, как правило, лояльны и редко уходят. В культурах, где важна кооперация и долгосрочные отношения, такой руководитель незаменим.`,
+    gaps:`<strong>Зоны внимания.</strong> Главная уязвимость — избегание сложных разговоров. Ради сохранения мира такой руководитель может затягивать обратную связь, не давать честную оценку, закрывать глаза на слабые результаты или токсичное поведение. Это разрушает команду медленно, но верно. Он также склонен принимать решения, исходя из того, "что люди подумают", а не из того, что правильно. Риск соглашательства на совещаниях — особенно в присутствии более доминантных коллег. Зависимость от одобрения может мешать отстаивать позицию перед вышестоящими.`,
+    recommend:`<strong>Как развиваться.</strong> 1. Разграничьте "нравиться людям" и "быть полезным людям" — иногда самое ценное, что вы можете сделать для человека, это честно сказать неприятное. Практикуйте это как навык заботы, а не критики. 2. Введите правило: важная обратная связь даётся не позже чем через 48 часов после события — не накапливайте, не ждите "подходящего момента". 3. На совещаниях фиксируйте свою позицию письменно до начала обсуждения — это защитит от соглашательства под давлением группы. 4. Тренируйте разговоры о результате: "Я ценю тебя как человека и хочу, чтобы ты был успешен — именно поэтому говорю это". 5. Работайте с границами: учитесь говорить "нет" запросам, которые мешают приоритетным задачам, без чувства вины.`
+  }
+};
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+questions.forEach(q=>shuffle(q.opts));
+
+let current = 0;
+let answers = new Array(15).fill(null);
+let chartInstance = null;
+
+function renderQuestion(){
+  const wrap = document.getElementById('questions-wrap');
+  const q = questions[current];
+  const sel = answers[current];
+
+  wrap.innerHTML = `
+    <div class="q-number">Вопрос ${current+1} из 15</div>
+    <div class="q-text">${current+1}. ${q.text}</div>
+    <div class="options">
+      ${q.opts.map((o,i)=>`
+        <button class="option${sel===i?' selected':''}" onclick="pick(${i})">
+          <div class="opt-bullet"><div class="opt-dot"></div></div>
+          <span class="opt-text">${o.t}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  const pct = Math.round((current / 15) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('q-prog-text').textContent = `Вопрос ${current+1} из 15`;
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('btn-prev').disabled = current === 0;
+  document.getElementById('btn-next').disabled = sel === null;
+
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.textContent = current === 14 ? 'Посмотреть результат →' : 'Далее →';
+}
+
+function pick(i){
+  answers[current] = i;
+  renderQuestion();
+  setTimeout(()=>{
+    if(current < 14){ current++; renderQuestion(); }
+    else { showResult(); }
+  }, 400);
+}
+
+function navigate(dir){
+  if(dir > 0 && current < 14){ current++; renderQuestion(); }
+  else if(dir > 0 && current === 14){ showResult(); }
+  else if(dir < 0 && current > 0){ current--; renderQuestion(); }
+}
+
+function showResult(){
+  const scores = {ach:0, pow:0, aff:0};
+  answers.forEach((ai, qi)=>{
+    if(ai !== null) scores[questions[qi].opts[ai].s]++;
+  });
+
+  const max = Math.max(scores.ach, scores.pow, scores.aff);
+  const winner = Object.keys(scores).find(k => scores[k] === max);
+  window._lastScores = scores;
+  window._lastWinner = winner;
+  const name = document.getElementById('uname').value.trim() || 'Участник';
+
+  document.getElementById('test-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'block';
+
+  document.getElementById('res-name').textContent = name;
+
+  // Score cards
+  const grid = document.getElementById('scores-grid');
+  grid.innerHTML = ['ach','pow','aff'].map(k=>`
+    <div class="score-card ${k}${k===winner?' leader':''}">
+      <div class="score-val">${scores[k]}</div>
+      <div class="score-label">${motiveInfo[k].label}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px;">из 15</div>
+    </div>
+  `).join('');
+
+  // Winner block
+  const wbw = document.getElementById('winner-block-wrap');
+  const w = motiveInfo[winner];
+  wbw.innerHTML = `
+    <div class="winner-block ${winner}">
+      <h3>Ведущий мотив — ${w.fullLabel}</h3>
+      <p style="margin-bottom:12px;">${w.strong}</p>
+      <p style="margin-bottom:12px;">${w.gaps}</p>
+      <div style="padding-top:14px; border-top:1px solid ${w.color}40;">
+        <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:${w.color}; font-weight:600; margin-bottom:8px;">Рекомендации по развитию</div>
+        <p>${w.recommend}</p>
+      </div>
+    </div>
+  `;
+
+  // Other motives
+  const gw = document.getElementById('gaps-wrap');
+  const otherMotives = ['ach','pow','aff'].filter(k=>k!==winner);
+  gw.innerHTML = `
+    <h3>Остальные шкалы</h3>
+    ${otherMotives.map(k=>`
+      <div class="gap-item">
+        <strong>${motiveInfo[k].label}</strong>
+        <div style="margin-bottom:8px; font-size:14px; line-height:1.7;">${motiveInfo[k].strong}</div>
+        <div style="margin-bottom:10px; font-size:14px; line-height:1.7;">${motiveInfo[k].gaps}</div>
+        <div style="padding-top:10px; border-top:1px solid var(--border);">
+          <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:6px;">Рекомендации по развитию</div>
+          <div style="font-size:14px; line-height:1.7;">${motiveInfo[k].recommend}</div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  // Chart
+  setTimeout(()=>{
+    const ctx = document.getElementById('myChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+    const maxScore = Math.max(scores.ach, scores.pow, scores.aff);
+    const chartMax = Math.max(15, maxScore + 1);
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Достижение','Власть / влияние','Причастность / отношения'],
+        datasets:[{
+          data: [scores.ach, scores.pow, scores.aff],
+          backgroundColor: ['#2D5A4E','#8B2020','#1A3A6E'],
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.raw} из 15 баллов`
+            }
+          }
+        },
+        scales: {
+          x: {
+            min: 0,
+            max: chartMax,
+            grid: { color: '#E2DDD8' },
+            ticks: {
+              stepSize: 1,
+              font: { family: 'Inter', size: 12 },
+              color: '#7A7470'
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: {
+              font: { family: 'Inter', size: 13 },
+              color: '#1A1714'
+            }
+          }
+        }
+      }
+    });
+  }, 100);
+
+  sendResults(name, scores, winner);
+}
+
+function sendResults(name, scores, winner){
+  const statusEl = document.getElementById('send-status');
+  const w = motiveInfo[winner];
+  const date = new Date().toLocaleString('ru-RU');
+  const stripHtml = s => s.replace(/<[^>]+>/g,'');
+
+  const barSvg = (label, val, color) => {
+    const pct = Math.round(val/5*100);
+    return `<tr>
+      <td style="font-size:13px;padding:4px 12px 4px 0;width:180px;">${label}</td>
+      <td style="padding:4px 8px 4px 0;"><div style="background:#E2DDD8;border-radius:4px;height:12px;width:200px;overflow:hidden;"><div style="background:${color};width:${pct}%;height:12px;border-radius:4px;"></div></div></td>
+      <td style="font-size:13px;font-weight:700;color:${color};padding:4px 0;width:40px;">${val}/5</td>
+    </tr>`;
+  };
+
+  const htmlBody = `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f4ef;padding:24px;">
+    <div style="background:#fff;border-radius:12px;padding:28px;border:1px solid #e2ddd8;">
+      <div style="border-bottom:2px solid #2D5A4E;padding-bottom:12px;margin-bottom:20px;">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#7A7470;margin-bottom:4px;">Тест мотивации руководителя</div>
+        <div style="font-size:20px;font-weight:700;color:#1A1714;">${name}</div>
+        <div style="font-size:12px;color:#7A7470;margin-top:2px;">${date}</div>
+      </div>
+
+      <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A7470;font-weight:700;margin-bottom:10px;">Результаты по шкалам</div>
+      <table style="border-collapse:collapse;margin-bottom:20px;">
+        ${barSvg('Достижение', scores.ach, '#2D5A4E')}
+        ${barSvg('Власть / влияние', scores.pow, '#8B2020')}
+        ${barSvg('Причастность / отношения', scores.aff, '#1A3A6E')}
+      </table>
+
+      <div style="border-left:4px solid ${w.color};background:${w.bg};padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:16px;">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${w.color};font-weight:700;margin-bottom:6px;">Ведущий мотив</div>
+        <div style="font-size:15px;font-weight:700;color:${w.color};margin-bottom:8px;">${w.fullLabel}</div>
+        <div style="font-size:12px;line-height:1.7;color:#333;">${stripHtml(w.strong)}</div>
+      </div>
+
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#7A7470;font-weight:700;margin-bottom:8px;">Зоны внимания</div>
+      <div style="font-size:12px;line-height:1.75;color:#444;margin-bottom:12px;">${stripHtml(w.gaps)}</div>
+
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${w.color};font-weight:700;margin-bottom:8px;">Рекомендации по развитию</div>
+      <div style="font-size:12px;line-height:1.75;color:#444;margin-bottom:20px;">${stripHtml(w.recommend)}</div>
+
+      <div style="background:#f0ebe0;border-radius:8px;padding:14px 16px;">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A7470;font-weight:700;margin-bottom:6px;">CSV для загрузки в таблицу</div>
+        <div style="font-family:monospace;font-size:12px;color:#333;">${name},${date},${scores.ach},${scores.pow},${scores.aff},${w.label}</div>
+      </div>
+    </div>
+  </div>`;
+
+  const WEBHOOK = 'https://script.google.com/macros/s/AKfycbwSRNamE_XoQ6IPY42jfRCF_ixWpeCCCtKSI-foz9NZURRd5bbyLmHIv9HhhbdzGx3U-w/exec';
+
+  fetch(WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      name: name,
+      position: 'Тест Макклелланда',
+      date: date,
+      ach: scores.ach,
+      pow: scores.pow,
+      aff: scores.aff,
+      winner: w.fullLabel,
+      csv: `${name},${date},${scores.ach},${scores.pow},${scores.aff},${w.label}`,
+      jsvg: htmlBody,
+      hsvg: '',
+      msvg: '',
+      johariZone: w.fullLabel,
+      qiDesc: stripHtml(w.strong),
+      message: htmlBody
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if(data.status === 'ok'){
+      statusEl.textContent = '✓ Результаты отправлены на почту';
+      statusEl.className = 'status-msg ok';
+    } else {
+      throw new Error(data.message || 'ошибка');
+    }
+  })
+  .catch(()=>{
+    statusEl.textContent = 'Не удалось отправить результаты автоматически.';
+    statusEl.className = 'status-msg err';
+  });
+}
+
+async function downloadPDF(){
+  const scores = window._lastScores;
+  const winner = window._lastWinner;
+  if(!scores) return;
+
+  const btn = document.querySelector('.btn-pdf');
+  btn.textContent = 'Создаём PDF...';
+  btn.disabled = true;
+
+  const name = document.getElementById('uname').value.trim() || 'Участник';
+  const stripHtml = s => s.replace(/<[^>]+>/g, '');
+  const otherMotives = ['ach','pow','aff'].filter(k => k !== winner);
+
+  const S = {
+    wrap: 'font-family:Arial,sans-serif;color:#1A1714;background:#fff;padding:50px 56px;width:794px;box-sizing:border-box;',
+    h1: 'font-size:22px;font-weight:700;margin:0 0 4px 0;color:#1A1714;',
+    sub: 'font-size:12px;color:#7A7470;margin:0;',
+    hr: 'border:none;border-top:2px solid #2D5A4E;margin:12px 0 20px 0;',
+    slbl: 'font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#7A7470;font-weight:700;margin:0 0 10px 0;',
+    barWrap: 'display:table;width:100%;margin-bottom:8px;',
+    barLbl: 'display:table-cell;font-size:13px;width:210px;vertical-align:middle;padding-right:12px;',
+    barBg: 'display:table-cell;vertical-align:middle;',
+    barVal: 'display:table-cell;font-size:13px;font-weight:700;width:36px;text-align:right;vertical-align:middle;padding-left:10px;',
+    mblk: (color,bg) => `border-left:4px solid ${color};background:${bg};padding:14px 18px;margin-bottom:14px;`,
+    mh2: (color) => `font-size:15px;font-weight:700;color:${color};margin:0 0 10px 0;`,
+    mp: 'font-size:12px;line-height:1.8;color:#333;margin:0 0 8px 0;',
+    rlbl: (color) => `font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:${color};margin:10px 0 5px 0;border-top:1px solid rgba(0,0,0,0.12);padding-top:10px;display:block;`,
+    oth: 'font-size:14px;font-weight:700;margin:22px 0 10px 0;padding-top:16px;border-top:1px solid #E2DDD8;color:#1A1714;',
+  };
+
+  const bar = (label, val, color) => `
+    <div style="${S.barWrap}">
+      <div style="${S.barLbl}">${label}</div>
+      <div style="${S.barBg}">
+        <div style="background:#E2DDD8;border-radius:5px;height:10px;overflow:hidden;">
+          <div style="background:${color};width:${val/5*100}%;height:10px;border-radius:5px;"></div>
+        </div>
+      </div>
+      <div style="${S.barVal};color:${color};">${val}/5</div>
+    </div>`;
+
+  const block = (k, isWinner) => {
+    const m = motiveInfo[k];
+    return `
+    <div style="${S.mblk(m.color, m.bg)}">
+      <div style="${S.mh2(m.color)}">${isWinner ? 'Ведущий мотив — ' + m.fullLabel : m.label}</div>
+      <div style="${S.mp}">${stripHtml(m.strong)}</div>
+      <div style="${S.mp}">${stripHtml(m.gaps)}</div>
+      <div style="${S.rlbl(m.color)}">Рекомендации по развитию</div>
+      <div style="${S.mp}">${stripHtml(m.recommend)}</div>
+    </div>`;
+  };
+
+  const el = document.getElementById('pdf-render');
+  el.style.display = 'block';
+  el.innerHTML = `<div style="${S.wrap}">
+    <div style="${S.h1}">Диагностика мотивации руководителя</div>
+    <div style="${S.sub}">${name} · Тест Макклелланда</div>
+    <hr style="${S.hr}">
+    <div style="${S.slbl}">Результаты по шкалам</div>
+    ${bar('Достижение', scores.ach, '#2D5A4E')}
+    ${bar('Власть / влияние', scores.pow, '#8B2020')}
+    ${bar('Причастность / отношения', scores.aff, '#1A3A6E')}
+    <div style="margin-top:20px;">${block(winner, true)}</div>
+    <div style="${S.oth}">Остальные шкалы</div>
+    ${otherMotives.map(k => block(k, false)).join('')}
+  </div>`;
+
+  await new Promise(r => setTimeout(r, 300));
+
+  try {
+    const canvas = await html2canvas(el.firstElementChild, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 794,
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4', hotfixes: ['px_scaling'] });
+    const pgW = pdf.internal.pageSize.getWidth();
+    const pgH = pdf.internal.pageSize.getHeight();
+    const ratio = pgW / canvas.width;
+    const totalH = canvas.height * ratio;
+    const slicePx = Math.floor(pgH / ratio);
+    let srcY = 0;
+
+    while(srcY < canvas.height) {
+      const h = Math.min(slicePx, canvas.height - srcY);
+      const tmp = document.createElement('canvas');
+      tmp.width = canvas.width;
+      tmp.height = h;
+      tmp.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, h, 0, 0, canvas.width, h);
+      pdf.addImage(tmp.toDataURL('image/png'), 'PNG', 0, 0, pgW, h * ratio);
+      srcY += h;
+      if(srcY < canvas.height) pdf.addPage();
+    }
+
+    pdf.save(`мотивация_${name.replace(/\s+/g,'_')}.pdf`);
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  }
+
+  el.style.display = 'none';
+  el.innerHTML = '';
+  btn.textContent = '⬇ Скачать результаты в PDF';
+  btn.disabled = false;
+}
+
+let consentGiven = false;
+
+function toggleConsent(){
+  consentGiven = !consentGiven;
+  document.getElementById('consent-row').classList.toggle('checked', consentGiven);
+  document.getElementById('btn-consent').disabled = !consentGiven;
+}
+
+function startTest(){
+  document.getElementById('consent-section').style.display = 'none';
+  document.getElementById('test-section').style.display = 'block';
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
